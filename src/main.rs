@@ -38,14 +38,14 @@ fn handle_stream(mut stream: TcpStream) {
     let _version = parts.next().unwrap();
 
     let headers = lines
-        .by_ref()
+        .clone()
         .skip(1)
         .take_while(|l| 
         {
-            println!("parse header: {}", l);
+            println!("take header: {}", l);
              !l.is_empty()})
         .filter_map(|l| {
- println!("parse header: {}", l);
+ println!("filter header: {}", l);
             l.split_once(": ")
 })
         .collect::<HashMap<&str, &str>>();
