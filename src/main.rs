@@ -44,7 +44,11 @@ fn handle_stream(mut stream: TcpStream) {
         .filter_map(|l| l.split_once(": "))
         .collect::<HashMap<&str, &str>>();
 
-    let body = lines.skip(1).collect::<Vec<_>>().join("\n");
+    let body = lines
+        .skip(1)
+        .filter(|l| !l.is_empty())
+        .collect::<Vec<_>>()
+        .join("\n");
 
     if path == "/" {
         ok_response(stream);
