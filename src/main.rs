@@ -22,9 +22,9 @@ fn main() {
 }
 
 fn handle_stream(mut stream: TcpStream) {
-    let buf = [0; 4096];
+    let mut buf = [0; 4096];
 
-    stream.read(&mut buf);
+    stream.read(&mut buf).unwrap();
 
     let request = String::from_utf8_lossy(&buf);
 
