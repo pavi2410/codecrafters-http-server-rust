@@ -1,5 +1,5 @@
 // Uncomment this block to pass the first stage
-use std::{net::{TcpListener, TcpStream}, io::{Write, Read}};
+use std::{net::{TcpListener, TcpStream}, io::{Write, Read, BufRead, Read}};
 
 fn main() {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -22,10 +22,13 @@ fn main() {
 }
 
 fn handle_stream(mut stream: TcpStream) {
-    let mut buf = String::new();
-    stream.read_to_string(&mut buf).unwrap();
+    let buf = [0; 4096];
 
-    let first_line = buf.lines().next().unwrap();
+    stream.read(&mut buf);
+
+    let request = String::from_utf8_lossy(&buf);
+
+    let first_line = request.lines().next().unwrap();
 
     let mut parts = first_line.split_whitespace();
 
