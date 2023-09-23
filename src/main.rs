@@ -41,7 +41,10 @@ fn handle_stream(mut stream: TcpStream) {
         .by_ref()
         .skip(1)
         .take_while(|line| !line.is_empty())
-        .filter_map(|l| l.split_once(": "))
+        .filter_map(|l| {
+ println!("parse header: {}", l);
+            l.split_once(": ")
+})
         .collect::<HashMap<&str, &str>>();
 
     println!("headers: {:?}", headers);
