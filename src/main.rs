@@ -38,8 +38,8 @@ fn handle_stream(mut stream: TcpStream) {
     let _version = parts.next().unwrap();
 
     let headers = lines
-        .clone()
         .skip(1)
+        .by_ref()
         .take_while(|l| 
         {
             println!("take header: {}", l);
@@ -53,8 +53,9 @@ fn handle_stream(mut stream: TcpStream) {
     println!("headers: {:?}", headers);
 
     let body = lines
-        // .by_ref()
+        
         .skip(1)
+        
         .filter(|l| !l.is_empty())
         .collect::<Vec<_>>()
         .join("\n");
