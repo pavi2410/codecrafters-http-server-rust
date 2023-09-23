@@ -47,6 +47,7 @@ fn handle_stream(mut stream: TcpStream) {
     println!("headers: {:?}", headers);
 
     let body = lines
+        .by_ref()
         .skip(1)
         .filter(|l| !l.is_empty())
         .collect::<Vec<_>>()
