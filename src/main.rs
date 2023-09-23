@@ -38,6 +38,17 @@ fn handle_stream(mut stream: TcpStream) {
 
     if path == "/" {
         stream.write(b"HTTP/1.1 200 OK\r\n\r\n").unwrap();
+    } else if path.starts_with("/echo") {
+        stream.write(b"HTTP/1.1 200 OK\r\n\r\n").unwrap();
+
+        match path.strip_prefix("/echo/") {
+            Some(echo_string) => {
+                stream.write(echo_string.as_bytes()).unwrap();
+            }
+            None => {
+                stream.write(b"HTTP/1.1 404 Not Found\r\n\r\n").unwrap();
+            }
+        }
     } else {
         stream.write(b"HTTP/1.1 404 Not Found\r\n\r\n").unwrap();
     }
