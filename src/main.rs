@@ -37,13 +37,14 @@ fn handle_stream(mut stream: TcpStream) {
     let path = parts.next().unwrap();
     let _version = parts.next().unwrap();
 
-    let headers = lines.clone()
+    let headers = lines
+        .clone()
         .skip(1)
         .take_while(|line| !line.is_empty())
         .filter_map(|l| l.split_once(": "))
         .collect::<HashMap<&str, &str>>();
 
-    let body = lines.skip(1).collect::<String>();
+    let body = lines.skip(1).collect::<Vec<_>>().join("\n");
 
     if path == "/" {
         ok_response(stream);
