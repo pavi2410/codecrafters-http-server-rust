@@ -1,5 +1,9 @@
 // Uncomment this block to pass the first stage
-use std::{net::{TcpListener, TcpStream}, io::{Write, Read}};
+use std::{
+    collections::HashMap,
+    io::{Read, Write},
+    net::{TcpListener, TcpStream},
+};
 
 fn main() {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -28,7 +32,9 @@ fn handle_stream(mut stream: TcpStream) {
 
     let request = String::from_utf8_lossy(&buf);
 
-    let first_line = request.lines().next().unwrap();
+    let mut lines = request.lines();
+
+    let first_line = lines.next().unwrap();
 
     let mut parts = first_line.split_whitespace();
 
@@ -36,22 +42,26 @@ fn handle_stream(mut stream: TcpStream) {
     let path = parts.next().unwrap();
     let _version = parts.next().unwrap();
 
+    let headers = lines
+        .skip(1)
+        .take_while(|line| !line.is_empty())
+        .filter_map(|l| l.split_once(": "))
+        .collect::<HashMap<&str, &str>>();
+
     if path == "/" {
         stream.write(b"HTTP/1.1 200 OK\r\n\r\n").unwrap();
     } else if path.starts_with("/echo") {
-        stream.write(b"HTTP/1.1 200 OK\r\n").unwrap();
-        stream.write(b"Content-Type: text/plain\r\n").unwrap();
-
-        match path.strip_prefix("/echo/") {
-            Some(echo_string) => {
-                write!(stream, "Content-Length: {}\r\n\r\n", echo_string.len()).unwrap();
-                stream.write(echo_string.as_bytes()).unwrap();
-            }
-            None => {
-                stream.write(b"HTTP/1.1 404 Not Found\r\n\r\n").unwrap();
-            }
-        }
+        text_response(stream, path.strip_prefix("/echo/").unwrap());
+    } else if path == "/user-agent" {
+        text_response(stream, headers.get("User-Agent").unwrap());
     } else {
         stream.write(b"HTTP/1.1 404 Not Found\r\n\r\n").unwrap();
     }
+}
+
+fn text_response(mut stream: TcpStream, text: &str) {
+    stream.write(b"HTTP/1.1 200 OK\r\n").unwrap();
+    stream.write(b"Content-Type: text/plain\r\n").unwrap();
+    write!(stream, "Content-Length: {}\r\n\r\n", text.len()).unwrap();
+    stream.write(text.as_bytes()).unwrap();
 }
