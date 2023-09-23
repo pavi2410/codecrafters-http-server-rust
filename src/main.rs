@@ -77,7 +77,7 @@ fn handle_stream(mut stream: TcpStream) {
 
                 let file_path = format!("{}/{}", directory, file_name);
 
-println!("body: ${}$", body);
+println!("body: ${}$", body.len());
 
                 std::fs::write(file_path, body).unwrap();
 
