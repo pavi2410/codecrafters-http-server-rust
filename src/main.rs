@@ -44,7 +44,7 @@ fn handle_stream(mut stream: TcpStream) {
         .filter_map(|l| l.split_once(": "))
         .collect::<HashMap<&str, &str>>();
 
-    let body = lines
+    let body = lines.next()
         .skip(1)
         .filter(|l| !l.is_empty())
         .collect::<Vec<_>>()
