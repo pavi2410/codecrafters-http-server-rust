@@ -40,7 +40,10 @@ fn handle_stream(mut stream: TcpStream) {
     let headers = lines
         .by_ref()
         .skip(1)
-        .take_while(|line| !line.is_empty())
+        .take_while(|line| 
+        {
+            println!("parse header: {}", l);
+             !line.is_empty()})
         .filter_map(|l| {
  println!("parse header: {}", l);
             l.split_once(": ")
