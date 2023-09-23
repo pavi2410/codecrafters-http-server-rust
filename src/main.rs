@@ -1,8 +1,10 @@
 // Uncomment this block to pass the first stage
 use std::{
     collections::HashMap,
+    env::args,
     io::{Read, Write},
-    net::{TcpListener, TcpStream}, thread,
+    net::{TcpListener, TcpStream},
+    thread,
 };
 
 fn main() {
@@ -42,14 +44,33 @@ fn handle_stream(mut stream: TcpStream) {
         .collect::<HashMap<&str, &str>>();
 
     if path == "/" {
-        stream.write(b"HTTP/1.1 200 OK\r\n\r\n").unwrap();
+        ok_response(stream);
     } else if path.starts_with("/echo") {
         text_response(stream, path.strip_prefix("/echo/").unwrap());
     } else if path == "/user-agent" {
         text_response(stream, headers.get("User-Agent").unwrap());
+    } else if path.starts_with("/files") {
+        let file_name = path.strip_prefix("/files/").unwrap();
+
+        let directory = args().nth(2).unwrap();
+
+        let file_path = format!("{}/{}", directory, file_name);
+
+        match std::fs::read(file_path) {
+            Ok(file_contents) => octet_stream_response(stream, &file_contents),
+            Err(_) => not_found_response(stream),
+        }
     } else {
-        stream.write(b"HTTP/1.1 404 Not Found\r\n\r\n").unwrap();
+        not_found_response(stream);
     }
+}
+
+fn ok_response(mut stream: TcpStream) {
+    stream.write(b"HTTP/1.1 200 OK\r\n\r\n").unwrap();
+}
+
+fn not_found_response(mut stream: TcpStream) {
+    stream.write(b"HTTP/1.1 404 Not Found\r\n\r\n").unwrap();
 }
 
 fn text_response(mut stream: TcpStream, text: &str) {
@@ -57,4 +78,11 @@ fn text_response(mut stream: TcpStream, text: &str) {
     stream.write(b"Content-Type: text/plain\r\n").unwrap();
     write!(stream, "Content-Length: {}\r\n\r\n", text.len()).unwrap();
     stream.write(text.as_bytes()).unwrap();
+}
+
+fn octet_stream_response(mut stream: TcpStream, bytes: &[u8]) {
+    stream.write(b"HTTP/1.1 200 OK\r\n").unwrap();
+    stream.write(b"Content-Type: application/octet-stream\r\n").unwrap();
+    write!(stream, "Content-Length: {}\r\n\r\n", bytes.len()).unwrap();
+    stream.write(bytes).unwrap();
 }
