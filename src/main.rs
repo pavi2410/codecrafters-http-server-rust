@@ -38,7 +38,7 @@ fn handle_stream(mut stream: TcpStream) {
     let _version = parts.next().unwrap();
 
     let headers = lines
-        .by_ref()
+        .clone()
         .skip(1)
         .take_while(|l| !l.is_empty())
         .filter_map(|l| l.split_once(": "))
@@ -47,6 +47,7 @@ fn handle_stream(mut stream: TcpStream) {
     println!("headers: {:?}", headers);
 
     let body = lines
+        .by_ref()
         .skip(1)
         .filter(|l| !l.is_empty())
         .collect::<Vec<_>>()
