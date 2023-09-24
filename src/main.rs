@@ -43,6 +43,8 @@ fn handle_stream(mut stream: TcpStream) {
         .filter_map(|l| l.split_once(": "))
         .collect::<HashMap<&str, &str>>();
 
+    println!("lines ##{:?}#", lines);
+
     let body = lines
         .filter(|l| !l.is_empty())
         .collect::<Vec<_>>()
@@ -77,7 +79,7 @@ fn handle_stream(mut stream: TcpStream) {
 
                 println!("headers: {:?}", headers);
 
-                println!("body: ${}$", body.chars().count());
+                println!("body: ${}$", body.len());
                 println!("body: ${}$", body);
 
                 std::fs::write(file_path, body).unwrap();
