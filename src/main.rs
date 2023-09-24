@@ -44,16 +44,12 @@ fn handle_stream(mut stream: TcpStream) {
         .filter_map(|l| l.split_once(": "))
         .collect::<HashMap<&str, &str>>();
 
-    println!("headers: {:?}", headers);
-
     let body = lines
         .by_ref()
         .skip(1)
         .filter(|l| !l.is_empty())
         .collect::<Vec<_>>()
         .join("\n");
-
-    println!("body: ${}$", body);
 
     if path == "/" {
         ok_response(stream);
@@ -81,6 +77,8 @@ fn handle_stream(mut stream: TcpStream) {
                 let directory = args().nth(2).unwrap();
 
                 let file_path = format!("{}/{}", directory, file_name);
+
+                println!("headers: {:?}", headers);
 
                 println!("body: ${}$", body.len());
                 println!("body: ${}$", body);
