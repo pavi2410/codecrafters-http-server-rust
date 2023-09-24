@@ -39,14 +39,11 @@ fn handle_stream(mut stream: TcpStream) {
 
     let headers = lines
         .by_ref()
-        .skip(1)
         .take_while(|l| !l.is_empty())
         .filter_map(|l| l.split_once(": "))
         .collect::<HashMap<&str, &str>>();
 
     let body = lines
-        .by_ref()
-        .skip(1)
         .filter(|l| !l.is_empty())
         .collect::<Vec<_>>()
         .join("\n");
