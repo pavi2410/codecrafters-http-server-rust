@@ -38,27 +38,21 @@ fn handle_stream(mut stream: TcpStream) {
     let _version = parts.next().unwrap();
 
     let headers = lines
-        .skip(1)
         .by_ref()
-        .take_while(|l| 
-        {
-            println!("take header: {}", l);
-             !l.is_empty()})
-        .filter_map(|l| {
- println!("filter header: {}", l);
-            l.split_once(": ")
-})
+        .skip(1)
+        .take_while(|l| !l.is_empty())
+        .filter_map(|l| l.split_once(": "))
         .collect::<HashMap<&str, &str>>();
 
     println!("headers: {:?}", headers);
 
     let body = lines
-        
         .skip(1)
-        
         .filter(|l| !l.is_empty())
         .collect::<Vec<_>>()
         .join("\n");
+
+    println!("body: ${}$", body);
 
     if path == "/" {
         ok_response(stream);
@@ -87,8 +81,8 @@ fn handle_stream(mut stream: TcpStream) {
 
                 let file_path = format!("{}/{}", directory, file_name);
 
-println!("body: ${}$", body.len());
-println!("body: ${}$", body);
+                println!("body: ${}$", body.len());
+                println!("body: ${}$", body);
 
                 std::fs::write(file_path, body).unwrap();
 
