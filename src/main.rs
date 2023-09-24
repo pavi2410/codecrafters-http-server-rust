@@ -77,7 +77,7 @@ fn handle_stream(mut stream: TcpStream) {
 
                 println!("headers: {:?}", headers);
 
-                println!("body: ${}$", body.len());
+                println!("body: ${}$", body.chars().count());
                 println!("body: ${}$", body);
 
                 std::fs::write(file_path, body).unwrap();
