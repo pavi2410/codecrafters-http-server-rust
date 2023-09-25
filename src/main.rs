@@ -29,7 +29,9 @@ fn handle_stream(mut stream: TcpStream) {
 
     let mut lines = request.lines();
 
-    let first_line = lines.next().unwrap();
+    let first_line = lines.by_ref()
+    .take(1)
+    .collect::<String>();
 
     let mut parts = first_line.split_whitespace();
 
@@ -37,16 +39,12 @@ fn handle_stream(mut stream: TcpStream) {
     let path = parts.next().unwrap();
     let _version = parts.next().unwrap();
 
-    let headers = lines
-        .by_ref()
+    let headers = lines.by_ref()
         .take_while(|l| !l.is_empty())
         .filter_map(|l| l.split_once(": "))
-        .collect::<HashMap<&str, &str>>();
+        .collect::<HashMap<_, _>>();
 
-    println!("lines ##{:?}#", lines);
-
-    let body = lines
-        .filter(|l| !l.is_empty())
+    let body = lines.by_ref()
         .collect::<Vec<_>>()
         .join("\n");
 
