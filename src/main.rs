@@ -75,7 +75,7 @@ fn handle_stream(mut stream: TcpStream) {
 
                 let file_path = format!("{}/{}", directory, file_name);
 
-                let content_size: usize = headers.get("Content-Length").unwrap();
+                let content_size: usize = headers.get("Content-Length").unwrap().parse().unwrap();
                 std::fs::write(file_path, &body[..content_size]).unwrap();
 
                 stream.write(b"HTTP/1.1 201 Created\r\n\r\n").unwrap();
